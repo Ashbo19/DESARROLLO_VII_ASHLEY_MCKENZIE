@@ -24,7 +24,7 @@ $jsonComplejo = '{
     "edad": 23,
     "hobbies": ["leer", "ejercicio", "estudiar"],
     "direccion": {
-        "calle": "Calle Principal",
+        "calle": "Calle",
         "numero": 50,
         "ciudad": "Panama"
     }

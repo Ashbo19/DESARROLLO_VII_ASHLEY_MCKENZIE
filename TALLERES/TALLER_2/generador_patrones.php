@@ -29,5 +29,4 @@
             $contador--;
         } while ($contador >= 1);
     echo "<br><br>";
-
 ?>

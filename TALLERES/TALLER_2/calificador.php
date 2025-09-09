@@ -36,5 +36,6 @@
         default:
         echo "Debes esforzarte mas";
     }
+    
 ?>
 
