@@ -1,6 +1,6 @@
 <?php
 // 1. Crear un arreglo de 10 nombres de ciudades
-$ciudades = ["Nueva York", "Tokio", "Londres", "París", "Sídney", "Río de Janeiro", "Moscú", "Berlín", "Ciudad del Cabo", "Toronto"];
+$ciudades = ["Nueva York", "Tokio", "Londres", "Paris", "Sidney", "Rio de Janeiro", "Moscu", "Berlin", "Ciudad del Cabo", "Toronto"];
 
 // 2. Imprimir el arreglo original
 echo "Ciudades originales:\n";
@@ -36,4 +36,22 @@ imprimirCiudadesOrdenadas($ciudades);
 // Ejemplo de uso: contarCiudadesPorInicial($ciudades, 'S') debería retornar 1 (Singapur)
 // Tu código aquí
 
+function contarCiudadesPorInicial($ciudades, $letra){
+   $letra = strtolower($letra); // Convertir a minúscula para comparar sin distinción
+    $filtradas = array_filter($ciudades, function($ciudad) use ($letra) {
+        return strtolower($ciudad[0]) === $letra;
+    });
+    return $filtradas;
+}
+
+$letra = 'B';
+$cantidad = contarCiudadesPorInicial($ciudades, $letra);
+echo "</br>Ciudades que comienzan con la letra '$letra':</br>";
+if (!empty($cantidad)) {
+    foreach ($cantidad as $ciudad) {
+        echo "- $ciudad</br>";
+    }
+} else {
+    echo "No hay ciudades que comiencen con la letra '$letra'.</br>";
+}
 ?>
