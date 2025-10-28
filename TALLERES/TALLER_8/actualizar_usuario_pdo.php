@@ -1,15 +1,17 @@
 <?php
 require_once "config_pdo.php";
+require_once "error_log.php";
 
 // Si se envía el formulario para actualizar
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["id"])) {
-    $id = $_POST["id"];
-    $nombre = $_POST["nombre"];
-    $email = $_POST["email"];
+    try {
+        $id = $_POST["id"];
+        $nombre = $_POST["nombre"];
+        $email = $_POST["email"];
 
-    $sql = "UPDATE usuarios SET nombre=:nombre, email=:email WHERE id=:id";
+        $sql = "UPDATE usuarios SET nombre=:nombre, email=:email WHERE id=:id";
 
-    if ($stmt = $pdo->prepare($sql)) {
+        $stmt = $pdo->prepare($sql);
         $stmt->bindParam(":nombre", $nombre, PDO::PARAM_STR);
         $stmt->bindParam(":email", $email, PDO::PARAM_STR);
         $stmt->bindParam(":id", $id, PDO::PARAM_INT);
@@ -17,19 +19,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["id"])) {
         if ($stmt->execute()) {
             echo "<p style='color:green;'>✅ Usuario actualizado correctamente con PDO.</p>";
         } else {
-            echo "<p style='color:red;'>❌ ERROR: No se pudo actualizar el registro.</p>";
+            if ($stmt->errorCode() !== '00000') {
+                throw new Exception("Error en la consulta: " . $stmt->errorInfo()[2]);
+            }
         }
+    } catch (Exception $e) {
+        echo "<p style='color:red;'>❌ ERROR: " . $e->getMessage() . "</p>";
+        registrarError("actualizar_usuario_pdo.php - " . $e->getMessage());
     }
 }
 
 // Mostrar formulario con datos existentes
 if (isset($_GET["id"])) {
-    $id = $_GET["id"];
-    $sql = "SELECT * FROM usuarios WHERE id=:id";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(":id", $id, PDO::PARAM_INT);
-    $stmt->execute();
-    if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    try {
+        $id = $_GET["id"];
+        $sql = "SELECT * FROM usuarios WHERE id=:id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(":id", $id, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        if ($stmt->errorCode() !== '00000') {
+            throw new Exception("Error en la consulta: " . $stmt->errorInfo()[2]);
+        }
+        
+        if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 ?>
 
 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
@@ -46,8 +59,12 @@ if (isset($_GET["id"])) {
 </form>
 
 <?php
-    } else {
-        echo "<p>No se encontró el usuario.</p>";
+        } else {
+            echo "<p>No se encontró el usuario.</p>";
+        }
+    } catch (Exception $e) {
+        echo "<p style='color:red;'>ERROR: " . $e->getMessage() . "</p>";
+        registrarError("actualizar_usuario_pdo.php - " . $e->getMessage());
     }
 }
 unset($stmt);

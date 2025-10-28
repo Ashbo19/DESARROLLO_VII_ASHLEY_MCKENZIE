@@ -1,32 +1,45 @@
 <?php
 require_once "config_mysqli.php";
+require_once "error_log.php";
 
-// Si se envía el formulario para actualizar
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["id"])) {
-    $id = $_POST["id"];
-    $nombre = mysqli_real_escape_string($conn, $_POST["nombre"]);
-    $email = mysqli_real_escape_string($conn, $_POST["email"]);
+    try {
+        $id = $_POST["id"];
+        $nombre = mysqli_real_escape_string($conn, $_POST["nombre"]);
+        $email = mysqli_real_escape_string($conn, $_POST["email"]);
 
-    $sql = "UPDATE usuarios SET nombre=?, email=? WHERE id=?";
+        $sql = "UPDATE usuarios SET nombre=?, email=? WHERE id=?";
 
-    if ($stmt = mysqli_prepare($conn, $sql)) {
-        mysqli_stmt_bind_param($stmt, "ssi", $nombre, $email, $id);
+        if ($stmt = mysqli_prepare($conn, $sql)) {
+            mysqli_stmt_bind_param($stmt, "ssi", $nombre, $email, $id);
 
-        if (mysqli_stmt_execute($stmt)) {
-            echo "<p style='color:green;'>✅ Usuario actualizado correctamente.</p>";
+            if (mysqli_stmt_execute($stmt)) {
+                echo "<p style='color:green;'>✅ Usuario actualizado correctamente.</p>";
+            } else {
+                throw new Exception("Error al ejecutar la consulta: " . mysqli_error($conn));
+            }
+            mysqli_stmt_close($stmt);
         } else {
-            echo "<p style='color:red;'>❌ ERROR: No se pudo actualizar el registro.</p>";
+            throw new Exception("Error al preparar la consulta: " . mysqli_error($conn));
         }
-        mysqli_stmt_close($stmt);
+    } catch (Exception $e) {
+        echo "<p style='color:red;'>❌ ERROR: " . $e->getMessage() . "</p>";
+        registrarError("actualizar_usuario_mysqli.php - " . $e->getMessage());
     }
 }
 
 // Mostrar formulario con datos existentes
 if (isset($_GET["id"])) {
-    $id = $_GET["id"];
-    $sql = "SELECT * FROM usuarios WHERE id=$id";
-    $result = mysqli_query($conn, $sql);
-    if ($row = mysqli_fetch_array($result)) {
+    try {
+        $id = $_GET["id"];
+        $sql = "SELECT * FROM usuarios WHERE id=$id";
+        $result = mysqli_query($conn, $sql);
+        
+        if (!$result) {
+            throw new Exception("Error en la consulta: " . mysqli_error($conn));
+        }
+        
+        if ($row = mysqli_fetch_array($result)) {
 ?>
 
 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
@@ -43,8 +56,12 @@ if (isset($_GET["id"])) {
 </form>
 
 <?php
-    } else {
-        echo "<p>No se encontró el usuario.</p>";
+        } else {
+            echo "<p>No se encontró el usuario.</p>";
+        }
+    } catch (Exception $e) {
+        echo "<p style='color:red;'>ERROR: " . $e->getMessage() . "</p>";
+        registrarError("actualizar_usuario_mysqli.php - " . $e->getMessage());
     }
 }
 mysqli_close($conn);
