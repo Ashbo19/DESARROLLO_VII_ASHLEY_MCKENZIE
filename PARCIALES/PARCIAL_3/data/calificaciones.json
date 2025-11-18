@@ -1,0 +1,10 @@
+{
+  "est1": {
+    "nombre": "Ana",
+    "calificaciones": [4.0, 3.5, 4.8, 4.2]
+  },
+  "est2": {
+    "nombre": "Luis",
+    "calificaciones": [3.0, 3.8, 4.1, 2.9]
+  }
+}

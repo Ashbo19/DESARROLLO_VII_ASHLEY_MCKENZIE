@@ -1,0 +1,3 @@
+[2025-10-29 01:10:47] [IP: ::1] SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '978-0307389732' for key 'libros.isbn'
+[2025-10-29 01:10:50] [IP: ::1] SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'ana@example.com' for key 'usuarios.email'
+[2025-10-29 01:10:53] [IP: ::1] Préstamo no encontrado o ya devuelto

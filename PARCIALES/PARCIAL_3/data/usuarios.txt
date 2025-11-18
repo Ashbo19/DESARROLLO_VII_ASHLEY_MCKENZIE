@@ -1,0 +1,4 @@
+prof1;clave123;Profesor
+est1;abc123;Estudiante
+est2;xyz789;Estudiante
+
