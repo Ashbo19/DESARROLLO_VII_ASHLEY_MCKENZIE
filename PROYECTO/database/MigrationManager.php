@@ -48,7 +48,27 @@ class MigrationManager {
 
     private function applyMigration($migration) {
         $sql = file_get_contents($this->migrationsPath . '/' . $migration);
-        $this->pdo->exec($sql);
+        
+        // Remove comments and split by semicolon
+        $statements = array_filter(
+            array_map('trim', 
+                preg_split('/;[\s]*$/m', $sql)
+            ),
+            function($statement) {
+                // Remove SQL comments and empty lines
+                $statement = preg_replace('/^--.*$/m', '', $statement);
+                $statement = trim($statement);
+                return !empty($statement);
+            }
+        );
+        
+        // Execute each statement separately
+        foreach ($statements as $statement) {
+            if (!empty(trim($statement))) {
+                $this->pdo->exec($statement);
+            }
+        }
+        
         $this->pdo->exec("INSERT INTO migrations (migration) VALUES ('$migration')");
         echo "Applied migration: $migration\n";
     }

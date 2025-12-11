@@ -15,16 +15,24 @@ class librosManager {
 
     // Método para crear una nueva tarea
     public function createlibros($libros) {
-        $stmt = $this->db->prepare("INSERT INTO libros (titulo, autor, isbn, anio_publicacion, cantidad_disponible, fecha_registro) VALUES (?,?,?,?,?,?)");
-        return $stmt->execute([
-            $libros->titulo,
-            $libros->autor,
-            $libros->isbn,
-            $libros->anio_publicacion,
-            $libros->cantidad_disponible,
-            $libros->fecha_registro,
-        
-        ]);
+         try {
+            $stmt = $this->db->prepare("INSERT INTO libros (titulo, autor, isbn, anio_publicacion, cantidad_disponible, categoria, estado, descripcion, id_usuario, fecha_registro) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            return $stmt->execute([
+                $libros->titulo,
+                $libros->autor,
+                $libros->isbn,
+                $libros->anio_publicacion,
+                $libros->cantidad_disponible,
+                $libros->categoria,
+                $libros->estado,
+                $libros->descripcion,
+                $libros->id_usuario,
+                $libros->fecha_registro,
+            ]);
+        } catch (PDOException $e) {
+            error_log("Error al crear libro: " . $e->getMessage());
+            throw $e;
+        }
     }
 
     // Método para cambiar el estado de una tarea (completada/no completada)
